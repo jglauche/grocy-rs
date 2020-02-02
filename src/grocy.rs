@@ -100,6 +100,7 @@ impl Grocy{
 	fn client(&self) -> RestClient {
 		let mut client = RestClient::new(&self.uri).unwrap();
 		client.set_header("GROCY-API-KEY", &self.api_key).unwrap();
+		client.set_header("User-Agent", "Grocy Rust Client").unwrap();
 		client
 	}
 
