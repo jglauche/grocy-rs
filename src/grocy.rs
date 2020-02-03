@@ -55,24 +55,24 @@ mod grocy_datetime_format{
 }
 
 
-#[allow(non_snake_case)]
 #[derive(Serialize,Deserialize,Debug)]
-struct GrocyVersion {
-	Version: String,
-	ReleaseDate: String,
+#[serde(rename_all = "PascalCase")]
+pub struct GrocyVersion {
+	pub version: String,
+	pub release_date: String,
 }
 
 #[derive(Serialize,Deserialize,Debug)]
-struct SystemInfo {
-    grocy_version: GrocyVersion,
-    php_version: String,
-    sqlite_version: String,
+pub struct SystemInfo {
+    pub grocy_version: GrocyVersion,
+    pub php_version: String,
+    pub sqlite_version: String,
 }
 
 #[derive(Serialize,Deserialize,Debug)]
-struct DbChangedTime {
+pub struct DbChangedTime {
 	#[serde(with = "grocy_datetime_format")]
-	changed_time: DateTime<Utc>,
+	pub changed_time: DateTime<Utc>,
 }
 
 impl RestPath<()> for SystemInfo { fn get_path(_: ()) -> Result<String,Error> { Ok(String::from("/api/system/info"))}}
