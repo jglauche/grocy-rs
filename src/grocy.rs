@@ -64,9 +64,9 @@ pub struct GrocyVersion {
 
 #[derive(Serialize,Deserialize,Debug)]
 pub struct SystemInfo {
-    pub grocy_version: GrocyVersion,
-    pub php_version: String,
-    pub sqlite_version: String,
+	pub grocy_version: GrocyVersion,
+	pub php_version: String,
+	pub sqlite_version: String,
 }
 
 #[derive(Serialize,Deserialize,Debug)]
