@@ -44,9 +44,9 @@ mod grocy_datetime_format{
 	}
 
 	pub fn deserialize<'de, D>(
-        deserializer: D,
-  ) -> Result<DateTime<Utc>, D::Error>
-  where
+				deserializer: D,
+	) -> Result<DateTime<Utc>, D::Error>
+	where
 	D: Deserializer<'de>,
 	{
 			let s = String::deserialize(deserializer)?;
