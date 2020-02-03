@@ -11,8 +11,12 @@ fn main() {
 			cli::query_config()
 		}
 	};
-	grocy.system_info();
-	grocy.db_changed_time();
+//	grocy.system_info();
+//	grocy.db_changed_time();
+//	grocy.locations();
+//	grocy.stock();
+	grocy.product();
+
 
 
 }
