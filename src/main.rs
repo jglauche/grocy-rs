@@ -15,8 +15,8 @@ fn main() {
 //	grocy.db_changed_time();
 //	grocy.locations();
 //	grocy.stock();
-	grocy.product();
-
+	grocy.products();
+//	grocy.product(11);
 
 
 }

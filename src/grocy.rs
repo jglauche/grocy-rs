@@ -205,8 +205,7 @@ impl RestPath<()> for Stock { fn get_path(_: ()) -> Result<String,Error> { Ok(St
 impl RestPath<()> for Locations { fn get_path(_: ()) -> Result<String,Error> { Ok(String::from("/api/objects/locations"))}}
 impl RestPath<()> for Products { fn get_path(_: ()) -> Result<String,Error> { Ok(String::from("/api/objects/products"))}}
 
-impl RestPath<()> for Product { fn get_path(_: ()) -> Result<String,Error> { Ok(String::from("/api/objects/products/11"))}}
-
+impl RestPath<u32> for Product { fn get_path(param: u32) -> Result<String,Error> { Ok(format!("/api/objects/products/{}", param))}} // fixme: id param
 
 
 
@@ -259,12 +258,18 @@ impl Grocy{
 
 	pub fn products(&self) {
 		let data: Products = self.client().get(()).unwrap();
-		println!("#{:?}", data);
+		match data {
+			Products::Array(a) => {
+				for x in a.iter() {
+					println!("{} {}", x.id, x.name);
+				}
+			}
+		}
 	}
 
-	pub fn product(&self) {
-		let data: Product = self.client().get(()).unwrap();
-		println!("#{:?}", data);
+	pub fn product(&self, param: u32) {
+		let data: Product = self.client().get(param).unwrap();
+		println!("{:?}", data);
 	}
 
 
