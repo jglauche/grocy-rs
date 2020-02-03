@@ -205,7 +205,7 @@ impl RestPath<()> for Stock { fn get_path(_: ()) -> Result<String,Error> { Ok(St
 impl RestPath<()> for Locations { fn get_path(_: ()) -> Result<String,Error> { Ok(String::from("/api/objects/locations"))}}
 impl RestPath<()> for Products { fn get_path(_: ()) -> Result<String,Error> { Ok(String::from("/api/objects/products"))}}
 
-impl RestPath<u32> for Product { fn get_path(param: u32) -> Result<String,Error> { Ok(format!("/api/objects/products/{}", param))}} // fixme: id param
+impl RestPath<u32> for Product { fn get_path(param: u32) -> Result<String,Error> { Ok(format!("/api/objects/products/{}", param))}}
 
 
 
