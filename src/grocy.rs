@@ -2,14 +2,36 @@ extern crate dirs;
 extern crate restson;
 extern crate serde_aux;
 
-use serde::{Serialize, Deserialize};
+use serde::{Serialize, Deserialize, Deserializer};
 use std::fs;
 use std::io;
 use std::io::Write;
 use std::fs::File;
+use std::str::FromStr;
+use std::fmt::Display;
 use restson::{RestClient,RestPath,Error};
 use chrono::{DateTime, Utc};
-use serde_aux::prelude::*;
+use serde_aux::prelude::deserialize_bool_from_anything;
+
+pub fn deserialize_number<'de, T, D>(deserializer: D) -> Result<T, D::Error>
+where
+	D: Deserializer<'de>,
+	T: FromStr + serde::Deserialize<'de>,
+	<T as FromStr>::Err: Display,
+{
+	#[derive(Deserialize)]
+	#[serde(untagged)]
+	enum StringOrInt<T> {
+		String(String),
+		Number(T),
+	}
+
+	match StringOrInt::<T>::deserialize(deserializer)? {
+		StringOrInt::String(s) => if s.is_empty() { "0" } else { &s }.parse::<T>().map_err(serde::de::Error::custom),
+		StringOrInt::Number(i) => Ok(i),
+	}
+}
+
 
 #[derive(Serialize, Deserialize)]
 pub struct Grocy{
@@ -84,15 +106,15 @@ enum Stock {
 
 #[derive(Serialize,Deserialize,Debug)]
 pub struct StockElement {
-	#[serde(deserialize_with="deserialize_number_from_string")]
+	#[serde(deserialize_with="deserialize_number")]
 	pub product_id: u32,
-	#[serde(deserialize_with="deserialize_number_from_string")]
+	#[serde(deserialize_with="deserialize_number")]
 	pub amount: u32,
-	#[serde(deserialize_with="deserialize_number_from_string")]
+	#[serde(deserialize_with="deserialize_number")]
 	pub amount_aggregated: u32,
-	#[serde(deserialize_with="deserialize_number_from_string")]
+	#[serde(deserialize_with="deserialize_number")]
 	pub amount_opened: u32,
-	#[serde(deserialize_with="deserialize_number_from_string")]
+	#[serde(deserialize_with="deserialize_number")]
 	pub amount_opened_aggregated: u32,
 	//fixme Date without time
 	pub best_before_date: String,
@@ -102,7 +124,7 @@ pub struct StockElement {
 }
 
 #[derive(Serialize,Deserialize,Debug)]
-pub struct OptionalU32( #[serde(deserialize_with="deserialize_number_from_string")] u32 );
+pub struct OptionalU32( #[serde(deserialize_with="deserialize_number")] u32 );
 
 #[derive(Serialize,Deserialize,Debug)]
 #[serde(untagged)]
@@ -110,24 +132,23 @@ enum Products {
 	Array(Vec<Product>)
 }
 
-
 #[derive(Serialize,Deserialize,Debug)]
 pub struct Product {
-	#[serde(deserialize_with="deserialize_number_from_string")]
+	#[serde(deserialize_with="deserialize_number")]
 	pub id: u32,
 	pub name: String,
 	pub description: Option<String>,
 	pub location_id: Option<OptionalU32>,
-	#[serde(deserialize_with="deserialize_number_from_string")]
+	#[serde(deserialize_with="deserialize_number")]
 	pub qu_id_purchase: u32,
-	#[serde(deserialize_with="deserialize_number_from_string")]
+	#[serde(deserialize_with="deserialize_number")]
 	pub qu_id_stock: u32,
-	// FIXME decimal #[serde(deserialize_with="deserialize_number_from_string")]
+	// FIXME decimal #[serde(deserialize_with="deserialize_number")]
 	pub qu_factor_purchase_to_stock: String,
 	pub barcode: String,
-	#[serde(deserialize_with="deserialize_number_from_string")]
+	#[serde(deserialize_with="deserialize_number")]
 	pub min_stock_amount: u32,
-	#[serde(deserialize_with="deserialize_number_from_string")]
+	#[serde(deserialize_with="deserialize_number")]
 	pub default_best_before_days: i32,
 	#[serde(with = "grocy_datetime_format")]
 	pub row_created_timestamp: DateTime<Utc>,
@@ -135,7 +156,7 @@ pub struct Product {
 	pub product_group_id: Option<OptionalU32>,
 	pub picture_file_name: Option<String>,
 
-	#[serde(deserialize_with="deserialize_number_from_string")]
+	#[serde(deserialize_with="deserialize_number")]
 	pub default_best_before_days_after_open: u32,
 
 	#[serde(deserialize_with = "deserialize_bool_from_anything")]
@@ -151,11 +172,11 @@ pub struct Product {
 
 	// Fixme
 	pub calories: Option<String>,
-	#[serde(deserialize_with="deserialize_number_from_string")]
+	#[serde(deserialize_with="deserialize_number")]
 	pub cumulate_min_stock_amount_of_sub_products: u32,
-	#[serde(deserialize_with="deserialize_number_from_string")]
+	#[serde(deserialize_with="deserialize_number")]
 	pub default_best_before_days_after_freezing: u32,
-	#[serde(deserialize_with="deserialize_number_from_string")]
+	#[serde(deserialize_with="deserialize_number")]
 	pub default_best_before_days_after_thawing: u32,
 
 }
@@ -168,7 +189,7 @@ enum Locations {
 
 #[derive(Serialize,Deserialize,Debug)]
 pub struct Location {
-	#[serde(deserialize_with="deserialize_number_from_string")]
+	#[serde(deserialize_with="deserialize_number")]
 	pub id: u32,
 	pub name: String,
 	pub description: Option<String>,
