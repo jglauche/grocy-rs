@@ -15,7 +15,7 @@ use tui::{backend::CrosstermBackend, Terminal};
 // use tui::widgets::{Widget, Block, Borders};
 // use tui::layout::{Layout, Constraint, Direction};
 
-pub fn main(ctrl: Controller) -> Result<(), failure::Error> {
+pub fn main(mut ctrl: Controller) -> Result<(), failure::Error> {
 	let mut stdout = stdout();
 
 	execute!(stdout, EnterAlternateScreen)?;
@@ -24,6 +24,7 @@ pub fn main(ctrl: Controller) -> Result<(), failure::Error> {
   terminal.clear()?;
 
 	loop{
+		ctrl.tick();
 		view::draw(&mut terminal, &ctrl)?;
 	}
 	Ok(())

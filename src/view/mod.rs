@@ -30,18 +30,17 @@ where
     let chunks = Layout::default()
         .constraints(
             [
-                Constraint::Length(7),
                 Constraint::Min(7),
                 Constraint::Length(7),
             ]
             .as_ref(),
         )
         .split(area);
-    draw_textbox(f, chunks[0]);
+    draw_textbox(f, ctrl, chunks[0]);
 }
 
 
-fn draw_textbox<B>(f: &mut Frame<B>, area: Rect)
+fn draw_textbox<B>(f: &mut Frame<B>, ctrl: &Controller, area: Rect)
 where
     B: Backend,
 {
@@ -66,7 +65,7 @@ where
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .title("Grocy")
+                .title(&ctrl.print_system_info())
                 .title_style(Style::default().fg(Color::Magenta).modifier(Modifier::BOLD)),
         )
         .wrap(true)

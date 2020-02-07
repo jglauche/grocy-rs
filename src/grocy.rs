@@ -236,10 +236,7 @@ impl Grocy{
 	}
 
 
-	pub fn system_info(&self) {
-		let data: SystemInfo = self.client().get(()).unwrap();
-		println!("{:?}", data);
-	}
+	pub fn system_info(&self) -> SystemInfo { self.client().get(()).unwrap() }
 
 	pub fn db_changed_time(&self) {
 		let data: DbChangedTime = self.client().get(()).unwrap();
