@@ -58,6 +58,8 @@ pub fn main(mut ctrl: Controller) -> Result<(), failure::Error> {
 					break;
 				},
 				KeyCode::Char(c) => ctrl.on_key(c),
+				KeyCode::Up => ctrl.on_up(),
+				KeyCode::Down => ctrl.on_down(),
 				_ => {},
 			},
 			Event::Tick => {

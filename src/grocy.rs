@@ -8,7 +8,8 @@ use std::io;
 use std::io::Write;
 use std::fs::File;
 use std::str::FromStr;
-use std::fmt::Display;
+use std::fmt;
+use std::fmt::{Display, Formatter};
 use restson::{RestClient,RestPath,Error};
 use chrono::{DateTime, Utc};
 use serde_aux::prelude::deserialize_bool_from_anything;
@@ -121,6 +122,12 @@ pub struct StockElement {
 	#[serde(deserialize_with = "deserialize_bool_from_anything")]
 	pub is_aggregated_amount: bool,
 	pub product: Product,
+}
+
+impl Display for StockElement{
+	fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+		write!(f, "{}   {}", self.amount, self.product.name)
+	}
 }
 
 #[derive(Serialize,Deserialize,Debug)]
