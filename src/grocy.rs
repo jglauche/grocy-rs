@@ -100,7 +100,7 @@ pub struct DbChangedTime {
 
 #[derive(Serialize,Deserialize,Debug)]
 #[serde(untagged)]
-enum Stock {
+pub enum Stock {
 	Array(Vec<StockElement>)
 }
 
@@ -128,7 +128,7 @@ pub struct OptionalU32( #[serde(deserialize_with="deserialize_number")] u32 );
 
 #[derive(Serialize,Deserialize,Debug)]
 #[serde(untagged)]
-enum Products {
+pub enum Products {
 	Array(Vec<Product>)
 }
 
@@ -183,7 +183,7 @@ pub struct Product {
 
 #[derive(Serialize,Deserialize,Debug)]
 #[serde(untagged)]
-enum Locations {
+pub enum Locations {
 	Array(Vec<Location>)
 }
 
@@ -238,24 +238,14 @@ impl Grocy{
 
 	pub fn system_info(&self) -> SystemInfo { self.client().get(()).unwrap() }
 
-	pub fn db_changed_time(&self) {
-		let data: DbChangedTime = self.client().get(()).unwrap();
-		println!("{:?}", data);
-	}
+	pub fn db_changed_time(&self) -> DbChangedTime { self.client().get(()).unwrap() }
 
-	pub fn stock(&self) {
-		let data: Stock = self.client().get(()).unwrap();
-		println!("#{:?}", data);
-	}
+	pub fn stock(&self) -> Stock { self.client().get(()).unwrap() }
 
-	pub fn locations(&self) {
-		let data: Locations = self.client().get(()).unwrap();
-		println!("#{:?}", data);
-	}
+	pub fn locations(&self) -> Locations { self.client().get(()).unwrap() }
 
-	pub fn products(&self) {
-		let data: Products = self.client().get(()).unwrap();
-		match data {
+	pub fn products(&self) -> Products {  self.client().get(()).unwrap() }
+/*		match data {
 			Products::Array(a) => {
 				for x in a.iter() {
 					println!("{} {}", x.id, x.name);
@@ -263,11 +253,10 @@ impl Grocy{
 			}
 		}
 	}
+*/
 
-	pub fn product(&self, param: u32) {
-		let data: Product = self.client().get(param).unwrap();
-		println!("{:?}", data);
-	}
+
+	pub fn product(&self, param: u32) -> Product { self.client().get(param).unwrap() }
 
 
 // for testing json files
