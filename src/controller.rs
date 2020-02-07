@@ -24,11 +24,14 @@ impl Controller {
 		}
 	}
 
-	pub fn tick(&mut self) {
+	pub fn on_tick(&mut self) {
 		match &self.system_info{
 			None => self.get_system_info(),
 			Some(_) => {},
 		}
+	}
+
+	pub fn on_key(&mut self, key: char) {
 	}
 
 	fn get_system_info(&mut self) {

@@ -1,4 +1,4 @@
-pub use crate::controller::Controller;
+pub use crate::controller::{AppState, Controller};
 
 use tui::backend::Backend;
 use tui::{Frame, Terminal};
@@ -17,7 +17,7 @@ pub fn draw<B: Backend>(terminal: &mut Terminal<B>, ctrl: &Controller) -> Result
 			.split(f.size());
 
 		match &ctrl.state {
-			Main => draw_main(&mut f, &ctrl, chunks[0]),
+			AppState::Main => draw_main(&mut f, &ctrl, chunks[0]),
 			_ => {}
 		};
 	})
