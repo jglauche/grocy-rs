@@ -22,7 +22,7 @@ fn mb<'a>(title: &'a str) -> tui::widgets::Block<'a> {
 pub fn draw<B: Backend>(terminal: &mut Terminal<B>, ctrl: &Controller) -> Result<(), io::Error> {
 	terminal.draw(|mut f| {
 		let chunks = Layout::default()
-		.constraints([Constraint::Min(20), Constraint::Min(0)].as_ref())
+		.constraints([Constraint::Percentage(100)].as_ref())
 		.split(f.size());
 
 		match &ctrl.state {
@@ -39,8 +39,7 @@ where
 	let chunks = Layout::default()
 		.constraints(
 			[
-				Constraint::Min(7),
-				Constraint::Length(10),
+				Constraint::Percentage(90),
 			]
 			.as_ref(),
 		)
