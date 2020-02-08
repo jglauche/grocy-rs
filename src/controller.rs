@@ -45,14 +45,44 @@ impl Controller {
 		}
 	}
 
-	pub fn on_down(&mut self){
-		self.index += 1;
-		// fixme: add check for max;
+	pub fn on_down(&mut self) {
+		if self.index < self.len() - 1 {
+			self.index += 1;
+		}
 	}
 
-	pub fn on_up(&mut self){
+	pub fn on_up(&mut self) {
 		if self.index > 0{
 			self.index -= 1;
+		}
+	}
+
+	pub fn on_pageup(&mut self) {
+		if self.index < 15 {
+			self.index = 0;
+		} else {
+			self.index -= 15;
+		}
+	}
+
+	pub fn on_pagedown(&mut self) {
+		if self.index + 15 < self.len() - 1 {
+			self.index += 15;
+		} else {
+			self.index = self.len() - 1;
+		}
+	}
+
+	// returns the length of the current list
+	pub fn len(&mut self) -> usize {
+		match &self.state {
+			AppState::Stock => {
+				match &self.stock{
+					Some(Stock::Array(a)) => a.len(),
+					None => 0,
+				}
+			},
+			_ => 0,
 		}
 	}
 
@@ -69,7 +99,7 @@ impl Controller {
 	fn reload_stock(&mut self){
 		self.stock = Some(self.model.stock());
 		match &self.state {
-			Loading => { self.state = AppState::Stock; }
+			AppState::Loading => { self.state = AppState::Stock; }
 			_ => {},
 		}
 	}

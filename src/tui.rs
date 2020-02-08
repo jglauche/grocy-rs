@@ -60,6 +60,8 @@ pub fn main(mut ctrl: Controller) -> Result<(), failure::Error> {
 				KeyCode::Char(c) => ctrl.on_key(c),
 				KeyCode::Up => ctrl.on_up(),
 				KeyCode::Down => ctrl.on_down(),
+				KeyCode::PageUp => ctrl.on_pageup(),
+				KeyCode::PageDown => ctrl.on_pagedown(),
 				_ => {},
 			},
 			Event::Tick => {
