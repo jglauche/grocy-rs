@@ -1,8 +1,12 @@
 use crate::grocy::*;
+extern crate enum_map;
+use enum_map::{Enum, EnumMap, enum_map};
 
+#[derive(Copy, Clone, Enum)]
 pub enum AppState {
 	Loading,
 	Stock,
+	Locations,
 }
 
 pub struct Controller {
@@ -10,8 +14,9 @@ pub struct Controller {
 	pub state: AppState,
 	pub system_info: Option<SystemInfo>,
 	pub stock: Option<Stock>,
+	pub locations: Option<Locations>,
 	pub db_changed_time: Option<DbChangedTime>,
-	pub index: usize,
+	pub index: EnumMap<AppState, usize>,
 }
 
 
@@ -23,8 +28,13 @@ impl Controller {
 			state: AppState::Loading,
 			system_info: None,
 			stock: None,
+			locations: None,
 			db_changed_time: None,
-			index: 0,
+			index: enum_map!{
+				AppState::Loading => 0,
+				AppState::Stock => 0,
+				AppState::Locations => 0,
+			},
 		}
 	}
 
@@ -34,8 +44,6 @@ impl Controller {
 			Some(_) => {},
 		}
 		self.check_db_change();
-
-
 	}
 
 	pub fn on_key(&mut self, key: char) {
@@ -46,30 +54,39 @@ impl Controller {
 	}
 
 	pub fn on_down(&mut self) {
-		if self.index < self.len() - 1 {
-			self.index += 1;
+		let len = self.len();
+		if len == 0 {
+			return
+		}
+
+		if self.index[self.state] < len - 1 {
+			 self.index[self.state] += 1;
 		}
 	}
 
 	pub fn on_up(&mut self) {
-		if self.index > 0{
-			self.index -= 1;
+		if self.index[self.state] > 0{
+			self.index[self.state] -= 1;
 		}
 	}
 
 	pub fn on_pageup(&mut self) {
-		if self.index < 15 {
-			self.index = 0;
+		if self.index[self.state] < 15 {
+			self.index[self.state] = 0;
 		} else {
-			self.index -= 15;
+			self.index[self.state] -= 15;
 		}
 	}
 
 	pub fn on_pagedown(&mut self) {
-		if self.index + 15 < self.len() - 1 {
-			self.index += 15;
+		if self.len() == 0{
+			return
+		}
+
+		if self.index[self.state] + 15 < self.len() - 1 {
+			self.index[self.state] += 15;
 		} else {
-			self.index = self.len() - 1;
+			self.index[self.state] = self.len() - 1;
 		}
 	}
 
@@ -90,10 +107,15 @@ impl Controller {
 		match &self.db_changed_time{
 			None => {
 				self.db_changed_time = Some(self.model.db_changed_time());
+				// self.reload_locations();
 				self.reload_stock();
 			},
 			Some(_) => {},
 		}
+	}
+
+	fn reload_locations(&mut self){
+		self.locations = Some(self.model.locations());
 	}
 
 	fn reload_stock(&mut self){

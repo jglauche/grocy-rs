@@ -102,7 +102,7 @@ pub struct DbChangedTime {
 #[derive(Serialize,Deserialize,Debug)]
 #[serde(untagged)]
 pub enum Stock {
-	Array(Vec<StockElement>)
+	Array(Vec<StockElement>),
 }
 
 #[derive(Serialize,Deserialize,Debug)]
@@ -205,6 +205,13 @@ pub struct Location {
 	#[serde(deserialize_with = "deserialize_bool_from_anything")]
 	pub is_freezer: bool,
 }
+
+impl Display for Location{
+	fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+		write!(f, "{}", self.name)
+	}
+}
+
 
 impl RestPath<()> for SystemInfo { fn get_path(_: ()) -> Result<String,Error> { Ok(String::from("/api/system/info"))}}
 impl RestPath<()> for DbChangedTime { fn get_path(_: ()) -> Result<String,Error> { Ok(String::from("/api/system/db-changed-time"))}}

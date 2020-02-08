@@ -62,7 +62,7 @@ where
 			.render(f, area);
 		},
 		AppState::Stock => {
-			match &ctrl.stock{
+			match &ctrl.stock {
 				None => {},
 				Some(i) => {
 					match i {
@@ -70,7 +70,7 @@ where
 							SelectableList::default()
 							.block(mb(&ctrl.print_system_info()))
 							.items(&a.iter().map(ToString::to_string).collect::<Vec<_>>())
-							.select(Some(ctrl.index))
+							.select(Some(ctrl.index[ctrl.state]))
 							.style(Style::default().fg(Color::White))
 							.highlight_style(Style::default().fg(Color::Magenta).modifier(Modifier::BOLD))
 							.highlight_symbol(">>")

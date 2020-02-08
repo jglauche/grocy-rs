@@ -16,6 +16,6 @@ chrono = { version = "0.4.10", features = ["serde"] }
 failure = "0.1.6"
 crossterm = "0.15"
 tui = { version = "0.8", default-features = false, features = ['crossterm'] }
-
+enum-map = "0.6.2"
 
 
