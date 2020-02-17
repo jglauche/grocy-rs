@@ -13,8 +13,8 @@ pub struct Controller {
 	pub model: Grocy,
 	pub state: AppState,
 	pub system_info: Option<SystemInfo>,
-	pub stock: Option<Vec<StockElement>>,
-	pub locations: Option<Vec<Location>>,
+	pub stock: Vec<StockElement>,
+	pub locations: Vec<Location>,
 	pub db_changed_time: Option<DbChangedTime>,
 	pub index: EnumMap<AppState, usize>,
 }
@@ -26,8 +26,8 @@ impl Controller {
 			model: model,
 			state: AppState::Loading,
 			system_info: None,
-			stock: None,
-			locations: None,
+			stock: Vec::new(),
+			locations: Vec::new(),
 			db_changed_time: None,
 			index: enum_map!{
 				AppState::Loading => 0,
@@ -39,10 +39,10 @@ impl Controller {
 
 	pub fn data(&self) -> Vec<String> {
 		match &self.state {
-			AppState::Stock => self.stock.as_ref().map(|a| a.iter().map(ToString::to_string).collect::<Vec<_>>() ),
-			AppState::Locations => self.locations.as_ref().map(|a| a.iter().map(ToString::to_string).collect::<Vec<_>>() ),
-			_ => None,
-		}.unwrap_or_else(Vec::new)
+			AppState::Stock => self.stock.iter().map(ToString::to_string).collect::<Vec<_>>(),
+			AppState::Locations => self.locations.iter().map(ToString::to_string).collect::<Vec<_>>(),
+			_ => Vec::new(),
+		}
 	}
 
 	pub fn on_tick(&mut self) {
@@ -100,12 +100,8 @@ impl Controller {
 	// returns the length of the current list
 	pub fn len(&mut self) -> usize {
 		match &self.state {
-			AppState::Stock => {
-				match &self.stock{
-					Some(a) => a.len(),
-					None => 0,
-				}
-			},
+			AppState::Stock => self.stock.len(),
+			AppState::Locations => self.locations.len(),
 			_ => 0,
 		}
 	}
@@ -114,7 +110,7 @@ impl Controller {
 		match &self.db_changed_time{
 			None => {
 				self.db_changed_time = Some(self.model.db_changed_time());
-				// self.reload_locations();
+				self.reload_locations();
 				self.reload_stock();
 			},
 			Some(_) => {},
@@ -122,11 +118,11 @@ impl Controller {
 	}
 
 	fn reload_locations(&mut self){
-		self.locations = Some(self.model.locations());
+		self.locations = self.model.locations();
 	}
 
 	fn reload_stock(&mut self){
-		self.stock = Some(self.model.stock());
+		self.stock = self.model.stock();
 		match &self.state {
 			AppState::Loading => { self.state = AppState::Stock; }
 			_ => {},
