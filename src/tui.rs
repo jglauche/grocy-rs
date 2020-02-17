@@ -38,9 +38,9 @@ pub fn main(mut ctrl: Controller) -> Result<(), failure::Error> {
 	thread::spawn(move || {
 		loop {
 			if event::poll(Duration::from_millis(50)).unwrap() {
-					if let CEvent::Key(key) = event::read().unwrap() {
-							tx.send(Event::Input(key)).unwrap();
-					}
+				if let CEvent::Key(key) = event::read().unwrap() {
+					tx.send(Event::Input(key)).unwrap();
+				}
 			}
 
 			tx.send(Event::Tick).unwrap();

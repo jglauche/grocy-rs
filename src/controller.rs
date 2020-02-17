@@ -2,7 +2,7 @@ use crate::grocy::*;
 extern crate enum_map;
 use enum_map::{Enum, EnumMap, enum_map};
 
-#[derive(Copy, Clone, Enum)]
+#[derive(Copy, Clone, Enum, PartialEq, Eq, Hash)]
 pub enum AppState {
 	Loading,
 	Stock,
@@ -13,15 +13,14 @@ pub struct Controller {
 	pub model: Grocy,
 	pub state: AppState,
 	pub system_info: Option<SystemInfo>,
-	pub stock: Option<Stock>,
-	pub locations: Option<Locations>,
+	pub stock: Option<Vec<StockElement>>,
+	pub locations: Option<Vec<Location>>,
 	pub db_changed_time: Option<DbChangedTime>,
 	pub index: EnumMap<AppState, usize>,
 }
 
 
 impl Controller {
-
 	pub fn new(model: Grocy) -> Self{
 		Controller {
 			model: model,
@@ -36,6 +35,14 @@ impl Controller {
 				AppState::Locations => 0,
 			},
 		}
+	}
+
+	pub fn data(&self) -> Vec<String> {
+		match &self.state {
+			AppState::Stock => self.stock.as_ref().map(|a| a.iter().map(ToString::to_string).collect::<Vec<_>>() ),
+			AppState::Locations => self.locations.as_ref().map(|a| a.iter().map(ToString::to_string).collect::<Vec<_>>() ),
+			_ => None,
+		}.unwrap_or_else(Vec::new)
 	}
 
 	pub fn on_tick(&mut self) {
@@ -95,7 +102,7 @@ impl Controller {
 		match &self.state {
 			AppState::Stock => {
 				match &self.stock{
-					Some(Stock::Array(a)) => a.len(),
+					Some(a) => a.len(),
 					None => 0,
 				}
 			},

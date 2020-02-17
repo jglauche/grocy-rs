@@ -61,28 +61,19 @@ where
 			.block(mb(&ctrl.print_system_info()))
 			.render(f, area);
 		},
-		AppState::Stock => {
-			match &ctrl.stock {
-				None => {},
-				Some(i) => {
-					match i {
-						Stock::Array(a) => {
-							SelectableList::default()
-							.block(mb(&ctrl.print_system_info()))
-							.items(&a.iter().map(ToString::to_string).collect::<Vec<_>>())
-							.select(Some(ctrl.index[ctrl.state]))
-							.style(Style::default().fg(Color::White))
-							.highlight_style(Style::default().fg(Color::Magenta).modifier(Modifier::BOLD))
-							.highlight_symbol(">>")
-							.render(f, area);
-						},
-						_ => {},
-					}
-				},
-			};
-		},
-		_ => {},
+		AppState::Stock | AppState::Locations => {
+			// TODO: try to move this logic into controller.
+			//
+			// Controller does match state, returns Vector of items as unified type, can chain more types to one type of view
+			SelectableList::default()
+			.block(mb(&ctrl.print_system_info()))
+			.items(&ctrl.data())
+			.select(Some(ctrl.index[ctrl.state]))
+			.style(Style::default().fg(Color::White))
+			.highlight_style(Style::default().fg(Color::Magenta).modifier(Modifier::BOLD))
+			.highlight_symbol(">>")
+			.render(f, area);
+		}
 	}
-
 }
 

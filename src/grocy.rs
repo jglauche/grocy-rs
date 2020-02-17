@@ -14,6 +14,7 @@ use restson::{RestClient,RestPath,Error};
 use chrono::{DateTime, Utc};
 use serde_aux::prelude::deserialize_bool_from_anything;
 
+
 pub fn deserialize_number<'de, T, D>(deserializer: D) -> Result<T, D::Error>
 where
 	D: Deserializer<'de>,
@@ -58,26 +59,27 @@ mod grocy_datetime_format{
 	const FORMAT: &'static str = "%Y-%m-%d %H:%M:%S";
 
 	pub fn serialize<S>(
-			date: &DateTime<Utc>,
-			serializer: S,
+		date: &DateTime<Utc>,
+		serializer: S,
 	) -> Result<S::Ok, S::Error>
 	where
 	S: Serializer,
 	{
-			let s = format!("{}", date.format(FORMAT));
-			serializer.serialize_str(&s)
+		let s = format!("{}", date.format(FORMAT));
+		serializer.serialize_str(&s)
 	}
 
 	pub fn deserialize<'de, D>(
-				deserializer: D,
+		deserializer: D,
 	) -> Result<DateTime<Utc>, D::Error>
 	where
 	D: Deserializer<'de>,
 	{
-			let s = String::deserialize(deserializer)?;
-			Utc.datetime_from_str(&s, FORMAT).map_err(serde::de::Error::custom)
+		let s = String::deserialize(deserializer)?;
+		Utc.datetime_from_str(&s, FORMAT).map_err(serde::de::Error::custom)
 	}
 }
+
 
 #[derive(Serialize,Deserialize,Debug)]
 #[serde(rename_all = "PascalCase")]
@@ -99,13 +101,11 @@ pub struct DbChangedTime {
 	pub changed_time: DateTime<Utc>,
 }
 
-#[derive(Serialize,Deserialize,Debug)]
-#[serde(untagged)]
-pub enum Stock {
-	Array(Vec<StockElement>),
-}
 
-#[derive(Serialize,Deserialize,Debug)]
+#[derive(Serialize,Deserialize,Debug,Clone)]
+struct Stock ( pub Vec<StockElement> );
+
+#[derive(Serialize,Deserialize,Debug,Clone)]
 pub struct StockElement {
 	#[serde(deserialize_with="deserialize_number")]
 	pub product_id: u32,
@@ -130,16 +130,13 @@ impl Display for StockElement{
 	}
 }
 
-#[derive(Serialize,Deserialize,Debug)]
+#[derive(Serialize,Deserialize,Debug,Clone)]
 pub struct OptionalU32( #[serde(deserialize_with="deserialize_number")] u32 );
 
-#[derive(Serialize,Deserialize,Debug)]
-#[serde(untagged)]
-pub enum Products {
-	Array(Vec<Product>)
-}
+#[derive(Serialize,Deserialize,Debug,Clone)]
+struct Products ( pub Vec<Product> );
 
-#[derive(Serialize,Deserialize,Debug)]
+#[derive(Serialize,Deserialize,Debug,Clone)]
 pub struct Product {
 	#[serde(deserialize_with="deserialize_number")]
 	pub id: u32,
@@ -188,13 +185,10 @@ pub struct Product {
 
 }
 
-#[derive(Serialize,Deserialize,Debug)]
-#[serde(untagged)]
-pub enum Locations {
-	Array(Vec<Location>)
-}
+#[derive(Serialize,Deserialize,Debug,Clone)]
+struct Locations ( pub Vec<Location> );
 
-#[derive(Serialize,Deserialize,Debug)]
+#[derive(Serialize,Deserialize,Debug,Clone)]
 pub struct Location {
 	#[serde(deserialize_with="deserialize_number")]
 	pub id: u32,
@@ -254,11 +248,11 @@ impl Grocy{
 
 	pub fn db_changed_time(&self) -> DbChangedTime { self.client().get(()).unwrap() }
 
-	pub fn stock(&self) -> Stock { self.client().get(()).unwrap() }
+	pub fn stock(&self) -> Vec<StockElement> { self.client().get::<_, Stock>(()).unwrap().0 }
 
-	pub fn locations(&self) -> Locations { self.client().get(()).unwrap() }
+	pub fn locations(&self) -> Vec<Location> { self.client().get::<_, Locations>(()).unwrap().0 }
 
-	pub fn products(&self) -> Products {  self.client().get(()).unwrap() }
+	pub fn products(&self) -> Vec<Product> {  self.client().get::<_, Products>(()).unwrap().0 }
 /*		match data {
 			Products::Array(a) => {
 				for x in a.iter() {
